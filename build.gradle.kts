@@ -30,6 +30,17 @@ intellijPlatform {
             sinceBuild = "253"
         }
     }
+
+    signing {
+        certificateChainFile = file(System.getProperty("user.home") + "/.ssh/chain.crt")
+        privateKeyFile = file(System.getProperty("user.home") + "/.ssh/private.pem")
+        password = providers.gradleProperty("signing.password")
+            .orElse(providers.environmentVariable("PLUGIN_SIGNING_PASSWORD"))
+    }
+
+    publishing {
+        token = providers.environmentVariable("ORG_GRADLE_PROJECT_intellijPlatformPublishingToken")
+    }
 }
 
 kotlin {
