@@ -1,0 +1,39 @@
+{
+  "name": "elixir-textmate",
+  "contributes": {
+    "languages": [
+      {
+        "id": "elixir",
+        "aliases": ["Elixir"],
+        "extensions": [".ex", ".exs"]
+      },
+      {
+        "id": "eex",
+        "aliases": ["EEx"],
+        "extensions": [".eex"]
+      },
+      {
+        "id": "html-eex",
+        "aliases": ["HTML (EEx)"],
+        "extensions": [".heex"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "elixir",
+        "scopeName": "source.elixir",
+        "path": "./syntaxes/elixir.json"
+      },
+      {
+        "language": "eex",
+        "scopeName": "text.elixir",
+        "path": "./syntaxes/eex.json"
+      },
+      {
+        "language": "html-eex",
+        "scopeName": "text.html.eex",
+        "path": "./syntaxes/html-eex.json"
+      }
+    ]
+  }
+}

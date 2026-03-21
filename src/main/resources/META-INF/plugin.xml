@@ -1,0 +1,101 @@
+<idea-plugin>
+    <id>com.thiromano.exact</id>
+    <name>Exact: Elixir Support</name>
+    <version>0.1.0</version>
+    <vendor url="https://thiromano.com">thiromano</vendor>
+
+    <description><![CDATA[
+    Elixir language support for JetBrains IDEs via the Expert Language Server.
+    <br/><br/>
+    Provides code completion, go-to-definition, hover documentation, diagnostics,
+    and other LSP features by integrating with
+    <a href="https://github.com/elixir-lang/expert">Expert</a> — the official
+    Elixir Language Server.
+    <br/><br/>
+    <b>Requirements:</b>
+    <ul>
+        <li>Expert binary installed and on PATH (or configured in Settings)</li>
+        <li>Elixir 1.15.3+ / Erlang 25.0+</li>
+    </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lsp</depends>
+    <depends>org.jetbrains.plugins.textmate</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="language"
+                instance="com.thiromano.exact.settings.ExpertConfigurable"
+                id="com.thiromano.exact.settings.ExpertConfigurable"
+                displayName="Exact: Elixir Support"/>
+
+        <applicationService
+                serviceImplementation="com.thiromano.exact.settings.ExpertSettings"/>
+
+        <platform.lsp.serverSupportProvider
+                implementation="com.thiromano.exact.lsp.ElixirLspServerSupportProvider"/>
+
+        <iconProvider implementation="com.thiromano.exact.ElixirIconProvider"/>
+
+        <textmate.bundleProvider
+                implementation="com.thiromano.exact.ElixirTextMateBundleProvider"/>
+
+        <colorSettingsPage
+                implementation="com.thiromano.exact.highlighting.ElixirColorSettingsPage"/>
+
+        <highlightingPassFactory
+                implementation="com.thiromano.exact.highlighting.ElixirHighlightingPassFactoryRegistrar"/>
+
+        <psi.implicitReferenceProvider
+                order="first"
+                implementation="com.thiromano.exact.lsp.ElixirImplicitReferenceProvider"/>
+
+        <lang.symbolSearchTarget
+                forClass="com.thiromano.exact.lsp.ElixirLspSymbol"
+                implementationClass="com.thiromano.exact.lsp.ElixirLspSymbolSearchTargetFactory"/>
+
+        <searcher forClass="com.intellij.find.usages.api.UsageSearchParameters"
+                 implementationClass="com.thiromano.exact.lsp.ElixirUsageSearcher"/>
+
+        <lang.syntaxHighlighterFactory
+                language="Elixir"
+                implementationClass="com.thiromano.exact.highlighting.ElixirSyntaxHighlighterFactory"/>
+
+        <lang.parserDefinition
+                language="Elixir"
+                implementationClass="com.thiromano.exact.ElixirParserDefinition"/>
+
+        <fileType
+                name="Elixir"
+                language="Elixir"
+                implementationClass="com.thiromano.exact.ElixirFileType"
+                fieldName="INSTANCE"
+                extensions="ex;exs"/>
+
+        <editorHighlighterProvider
+                filetype="Elixir"
+                implementationClass="com.thiromano.exact.highlighting.ElixirEditorHighlighterProvider"/>
+
+        <notificationGroup id="Elixir"
+                           displayType="BALLOON"/>
+
+    </extensions>
+
+    <actions>
+        <group id="Elixir.ToolsMenu" text="Elixir" popup="true"
+               icon="/icons/elixir.svg">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+
+            <action id="Elixir.RestartExpert"
+                    class="com.thiromano.exact.lsp.RestartExpertAction"
+                    text="Restart Expert LSP"
+                    description="Stop and restart the Expert Language Server"/>
+
+            <action id="Elixir.ReindexExpert"
+                    class="com.thiromano.exact.lsp.ReindexExpertAction"
+                    text="Reindex Project"
+                    description="Rebuild Expert's code search index"/>
+        </group>
+    </actions>
+</idea-plugin>
