@@ -80,6 +80,12 @@
         <notificationGroup id="Elixir"
                            displayType="BALLOON"/>
 
+        <additionalLibraryRootsProvider
+                implementation="com.thiromano.exact.ElixirAdditionalLibraryRootsProvider"/>
+
+        <postStartupActivity
+                implementation="com.thiromano.exact.ElixirProjectConfigurator"/>
+
     </extensions>
 
     <actions>
