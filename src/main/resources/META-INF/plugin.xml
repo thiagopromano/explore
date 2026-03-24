@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>com.thiromano.exact</id>
     <name>Exact: Elixir Support</name>
     <version>0.1.0</version>
