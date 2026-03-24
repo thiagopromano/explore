@@ -53,7 +53,7 @@ Before launching the sandbox IDE, clear the log file. **Each command must be run
 
 ```bash
 # 1. Clear the log (separate command)
-> .intellijPlatform/sandbox/exact-elixir-support/IU-2025.3.3/log/idea.log
+> .intellijPlatform/sandbox/exact-elixir-support/RM-2025.3.3/log/idea.log
 
 # 2. Launch the IDE (separate command, run in background)
 ./gradlew runIde
@@ -61,5 +61,5 @@ Before launching the sandbox IDE, clear the log file. **Each command must be run
 
 Plugin logs are at:
 ```
-.intellijPlatform/sandbox/exact-elixir-support/IU-2025.3.3/log/idea.log
+.intellijPlatform/sandbox/exact-elixir-support/RM-2025.3.3/log/idea.log
 ```
