@@ -3,11 +3,15 @@ package com.thiromano.exact.settings
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ShowSettingsUtil
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
+import com.thiromano.exact.lsp.ElixirLspServerSupportProvider
+import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JSpinner
@@ -18,6 +22,7 @@ class ExpertConfigurable : Configurable {
     private var panel: JPanel? = null
     private var expertPathField: TextFieldWithBrowseButton? = null
     private var minQueryLengthSpinner: JSpinner? = null
+    private var downloadButton: JButton? = null
 
     override fun getDisplayName(): String = "Exact: Elixir Support"
 
@@ -36,6 +41,10 @@ class ExpertConfigurable : Configurable {
         ).apply {
             foreground = JBUI.CurrentTheme.ContextHelp.FOREGROUND
             font = JBUI.Fonts.smallFont()
+        }
+
+        downloadButton = JButton("Download Expert").apply {
+            addActionListener { downloadExpert() }
         }
 
         minQueryLengthSpinner = JSpinner(
@@ -66,6 +75,7 @@ class ExpertConfigurable : Configurable {
         panel = FormBuilder.createFormBuilder()
             .addLabeledComponent("Expert binary path:", expertPathField!!, 1, false)
             .addComponentToRightColumn(pathHint, 0)
+            .addComponentToRightColumn(downloadButton!!, 0)
             .addLabeledComponent("Min symbol query length:", minQueryLengthSpinner!!, 1, false)
             .addComponentToRightColumn(queryHint, 0)
             .addSeparator()
@@ -76,6 +86,29 @@ class ExpertConfigurable : Configurable {
         return panel!!
     }
 
+    private fun downloadExpert() {
+        if (ExpertDownloader.getAssetName() == null) {
+            downloadButton?.text = "Unsupported platform"
+            return
+        }
+
+        downloadButton?.isEnabled = false
+        downloadButton?.text = "Downloading..."
+
+        ExpertDownloader.download(
+            project = null,
+            onSuccess = { destFile ->
+                expertPathField?.text = destFile.absolutePath
+                downloadButton?.text = "Download Expert"
+                downloadButton?.isEnabled = true
+            },
+            onError = {
+                downloadButton?.text = "Download failed"
+                downloadButton?.isEnabled = true
+            }
+        )
+    }
+
     override fun isModified(): Boolean {
         val settings = ExpertSettings.getInstance()
         return expertPathField?.text != (settings.expertPath ?: "") ||
@@ -84,8 +117,20 @@ class ExpertConfigurable : Configurable {
 
     override fun apply() {
         val settings = ExpertSettings.getInstance()
+        val oldPath = settings.expertPath
         settings.expertPath = expertPathField?.text?.takeIf { it.isNotBlank() }
         settings.minQueryLength = minQueryLengthSpinner?.value as? Int ?: ExpertSettings.DEFAULT_MIN_QUERY_LENGTH
+
+        if (oldPath != settings.expertPath) {
+            restartLspServers()
+        }
+    }
+
+    private fun restartLspServers() {
+        for (project in ProjectManager.getInstance().openProjects) {
+            LspServerManager.getInstance(project)
+                .stopAndRestartIfNeeded(ElixirLspServerSupportProvider::class.java)
+        }
     }
 
     override fun reset() {
@@ -98,5 +143,6 @@ class ExpertConfigurable : Configurable {
         panel = null
         expertPathField = null
         minQueryLengthSpinner = null
+        downloadButton = null
     }
 }

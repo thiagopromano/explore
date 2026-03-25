@@ -1,6 +1,7 @@
 package com.thiromano.exact.lsp
 
 import com.thiromano.exact.settings.ExpertConfigurable
+import com.thiromano.exact.settings.ExpertDownloader
 import com.thiromano.exact.settings.ExpertSettings
 import com.google.gson.JsonObject
 import com.google.gson.JsonArray
@@ -71,6 +72,17 @@ class ElixirLspServerDescriptor(project: Project) :
                         "or configure the binary path in Settings.",
                     NotificationType.WARNING
                 )
+                .addAction(object : NotificationAction("Download Expert") {
+                    override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+                        notification.expire()
+                        ExpertDownloader.download(
+                            project = project,
+                            onSuccess = { destFile ->
+                                ExpertDownloader.applyAndRestart(project, destFile)
+                            }
+                        )
+                    }
+                })
                 .addAction(object : NotificationAction("Configure Expert Path") {
                     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
                         ShowSettingsUtil.getInstance().showSettingsDialog(project, ExpertConfigurable::class.java)
