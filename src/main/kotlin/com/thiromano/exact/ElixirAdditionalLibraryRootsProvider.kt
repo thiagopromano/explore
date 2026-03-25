@@ -13,8 +13,23 @@ class ElixirAdditionalLibraryRootsProvider : AdditionalLibraryRootsProvider() {
     override fun getAdditionalProjectLibraries(project: Project): Collection<SyntheticLibrary> {
         val baseDir = project.guessProjectDir() ?: return emptyList()
         if (baseDir.findChild("mix.exs") == null) return emptyList()
-        val depsDir = baseDir.findChild("deps") ?: return emptyList()
-        return listOf(ElixirDepsLibrary(depsDir))
+
+        val libraries = mutableListOf<SyntheticLibrary>()
+
+        // Root deps
+        baseDir.findChild("deps")?.let { libraries.add(ElixirDepsLibrary(it)) }
+
+        // Umbrella sub-app deps
+        val appsDir = baseDir.findChild("apps")
+        if (appsDir != null && appsDir.isDirectory) {
+            for (child in appsDir.children) {
+                if (child.isDirectory && child.findChild("mix.exs") != null) {
+                    child.findChild("deps")?.let { libraries.add(ElixirDepsLibrary(it)) }
+                }
+            }
+        }
+
+        return libraries
     }
 
     private class ElixirDepsLibrary(private val depsDir: VirtualFile) : SyntheticLibrary(), ItemPresentation {

@@ -27,23 +27,38 @@ class ElixirProjectConfigurator : ProjectActivity {
         val baseDir = project.guessProjectDir() ?: return
         if (baseDir.findChild("mix.exs") == null) return
 
-        val testDir = baseDir.findChild("test")
-        val excludedDirs = EXCLUDED_DIR_NAMES.mapNotNull { baseDir.findChild(it) }
-        if (testDir == null && excludedDirs.isEmpty()) return
+        val mixRoots = mutableListOf(baseDir)
+        // Umbrella projects: include sub-apps under apps/
+        val appsDir = baseDir.findChild("apps")
+        if (appsDir != null && appsDir.isDirectory) {
+            for (child in appsDir.children) {
+                if (child.isDirectory && child.findChild("mix.exs") != null) {
+                    mixRoots.add(child)
+                }
+            }
+        }
+
+        val testDirs = mixRoots.mapNotNull { it.findChild("test") }
+        val excludedDirs = mixRoots.flatMap { root ->
+            EXCLUDED_DIR_NAMES.mapNotNull { root.findChild(it) }
+        }
+        if (testDirs.isEmpty() && excludedDirs.isEmpty()) return
 
         for (module in ModuleManager.getInstance(project).modules) {
             val rootManager = ModuleRootManager.getInstance(module)
-            if (isAlreadyConfigured(rootManager, testDir, excludedDirs)) continue
+            if (isAlreadyConfigured(rootManager, testDirs, excludedDirs)) continue
 
             writeAction {
                 val model = rootManager.modifiableModel
                 for (entry in model.contentEntries) {
                     val entryFile = entry.file ?: continue
 
-                    if (testDir != null && VfsUtil.isAncestor(entryFile, testDir, true)) {
-                        val alreadyMarked = entry.sourceFolders.any { it.file == testDir }
-                        if (!alreadyMarked) {
-                            entry.addSourceFolder(testDir, /* isTestSource = */ true)
+                    for (testDir in testDirs) {
+                        if (VfsUtil.isAncestor(entryFile, testDir, true)) {
+                            val alreadyMarked = entry.sourceFolders.any { it.file == testDir }
+                            if (!alreadyMarked) {
+                                entry.addSourceFolder(testDir, /* isTestSource = */ true)
+                            }
                         }
                     }
 
@@ -63,11 +78,13 @@ class ElixirProjectConfigurator : ProjectActivity {
 
     private fun isAlreadyConfigured(
         rootManager: ModuleRootManager,
-        testDir: VirtualFile?,
+        testDirs: List<VirtualFile>,
         excludedDirs: List<VirtualFile>,
     ): Boolean {
         val entries = rootManager.contentEntries
-        val testOk = testDir == null || entries.any { e -> e.sourceFolders.any { it.file == testDir } }
+        val testOk = testDirs.all { testDir ->
+            entries.any { e -> e.sourceFolders.any { it.file == testDir } }
+        }
         val excludeOk = excludedDirs.all { dir ->
             entries.any { e -> e.excludeFolders.any { it.file == dir } }
         }
