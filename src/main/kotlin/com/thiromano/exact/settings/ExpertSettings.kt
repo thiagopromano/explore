@@ -14,7 +14,8 @@ import com.intellij.openapi.components.Storage
 class ExpertSettings : PersistentStateComponent<ExpertSettings.State> {
 
     data class State(
-        var expertPath: String? = null
+        var expertPath: String? = null,
+        var minQueryLength: Int = DEFAULT_MIN_QUERY_LENGTH
     )
 
     private var state = State()
@@ -25,14 +26,23 @@ class ExpertSettings : PersistentStateComponent<ExpertSettings.State> {
             state.expertPath = value
         }
 
+    var minQueryLength: Int
+        get() = state.minQueryLength
+        set(value) {
+            state.minQueryLength = value
+        }
+
+    companion object {
+        const val DEFAULT_MIN_QUERY_LENGTH = 2
+
+        fun getInstance(): ExpertSettings =
+            ApplicationManager.getApplication().getService(ExpertSettings::class.java)
+    }
+
     override fun getState(): State = state
 
     override fun loadState(state: State) {
         this.state = state
     }
 
-    companion object {
-        fun getInstance(): ExpertSettings =
-            ApplicationManager.getApplication().getService(ExpertSettings::class.java)
-    }
 }

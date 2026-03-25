@@ -1,6 +1,9 @@
 package com.thiromano.exact.lsp
 
 import com.thiromano.exact.settings.ExpertSettings
+import com.google.gson.JsonObject
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.diagnostic.Logger
@@ -28,6 +31,19 @@ class ElixirLspServerDescriptor(project: Project) :
 
         return GeneralCommandLine(expertPath, "--stdio").apply {
             withWorkDirectory(project.basePath)
+        }
+    }
+
+    override fun createInitializationOptions(): Any {
+        val settings = ExpertSettings.getInstance()
+        return JsonObject().apply {
+            add("workspaceSymbols", JsonObject().apply {
+                addProperty("minQueryLength", settings.minQueryLength)
+            })
+            add("additionalWatchedExtensions", JsonArray().apply {
+                add(JsonPrimitive(".heex"))
+                add(JsonPrimitive(".eex"))
+            })
         }
     }
 
