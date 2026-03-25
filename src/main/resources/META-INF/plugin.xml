@@ -58,6 +58,9 @@
         <searcher forClass="com.intellij.find.usages.api.UsageSearchParameters"
                  implementationClass="com.thiromano.exact.lsp.ElixirUsageSearcher"/>
 
+        <gotoClassContributor
+                implementation="com.thiromano.exact.lsp.ElixirGoToClassContributor"/>
+
         <lang.syntaxHighlighterFactory
                 language="Elixir"
                 implementationClass="com.thiromano.exact.highlighting.ElixirSyntaxHighlighterFactory"/>

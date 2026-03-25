@@ -2,13 +2,18 @@ package com.thiromano.exact.lsp
 
 import com.thiromano.exact.settings.ExpertSettings
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerListener
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
+import com.intellij.platform.lsp.api.customization.LspCustomization
+import com.intellij.platform.lsp.api.customization.LspSymbolKindCustomizer
 import org.eclipse.lsp4j.InitializeResult
 import org.eclipse.lsp4j.ServerCapabilities
+import org.eclipse.lsp4j.SymbolKind
+import javax.swing.Icon
 
 class ElixirLspServerDescriptor(project: Project) :
     ProjectWideLspServerDescriptor(project, "Expert") {
@@ -23,6 +28,16 @@ class ElixirLspServerDescriptor(project: Project) :
 
         return GeneralCommandLine(expertPath, "--stdio").apply {
             withWorkDirectory(project.basePath)
+        }
+    }
+
+    override val lspCustomization = object : LspCustomization() {
+        override val symbolKindCustomizer = object : LspSymbolKindCustomizer() {
+            override fun getIcon(symbolKind: SymbolKind): Icon = when (symbolKind) {
+                SymbolKind.Module -> AllIcons.Nodes.Class
+                SymbolKind.Struct -> AllIcons.Nodes.Record
+                else -> super.getIcon(symbolKind) ?: AllIcons.Nodes.Class
+            }
         }
     }
 
