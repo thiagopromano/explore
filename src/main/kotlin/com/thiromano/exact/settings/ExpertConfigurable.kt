@@ -2,7 +2,9 @@ package com.thiromano.exact.settings
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
@@ -47,11 +49,27 @@ class ExpertConfigurable : Configurable {
             font = JBUI.Fonts.smallFont()
         }
 
+        val colorSettingsLink = HyperlinkLabel("Elixir Color Scheme Settings").apply {
+            addHyperlinkListener {
+                ShowSettingsUtil.getInstance().showSettingsDialog(
+                    null as com.intellij.openapi.project.Project?,
+                    { configurable ->
+                        configurable is com.intellij.openapi.options.SearchableConfigurable &&
+                            configurable.displayName == "Elixir" &&
+                            configurable.id.contains("colors")
+                    },
+                    null
+                )
+            }
+        }
+
         panel = FormBuilder.createFormBuilder()
             .addLabeledComponent("Expert binary path:", expertPathField!!, 1, false)
             .addComponentToRightColumn(pathHint, 0)
             .addLabeledComponent("Min symbol query length:", minQueryLengthSpinner!!, 1, false)
             .addComponentToRightColumn(queryHint, 0)
+            .addSeparator()
+            .addComponent(colorSettingsLink)
             .addComponentFillVertically(JPanel(), 0)
             .panel
 

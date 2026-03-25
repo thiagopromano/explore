@@ -11,8 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerListener
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
-import com.intellij.platform.lsp.api.customization.LspCustomization
-import com.intellij.platform.lsp.api.customization.LspSymbolKindCustomizer
+import com.intellij.platform.lsp.api.customization.*
 import org.eclipse.lsp4j.InitializeResult
 import org.eclipse.lsp4j.ServerCapabilities
 import org.eclipse.lsp4j.SymbolKind
@@ -47,7 +46,19 @@ class ElixirLspServerDescriptor(project: Project) :
         }
     }
 
+    // Syntax highlighting uses TextMate grammars, not LSP semantic tokens.
+    // Expert does not support: semantic tokens, type definition, implementation,
+    // declaration, rename, folding, inlay hints, signature help, document highlights,
+    // selection range, call/type hierarchy.
     override val lspCustomization = object : LspCustomization() {
+        override val semanticTokensCustomizer = LspSemanticTokensDisabled
+        override val goToTypeDefinitionCustomizer = LspGoToTypeDefinitionDisabled
+        override val foldingRangeCustomizer = LspFoldingRangeDisabled
+        override val inlayHintCustomizer = LspInlayHintDisabled
+        override val documentHighlightsCustomizer = LspDocumentHighlightsDisabled
+        override val signatureHelpCustomizer = LspSignatureHelpDisabled
+        override val selectionRangeCustomizer = LspSelectionRangeDisabled
+
         override val symbolKindCustomizer = object : LspSymbolKindCustomizer() {
             override fun getIcon(symbolKind: SymbolKind): Icon = when (symbolKind) {
                 SymbolKind.Module -> AllIcons.Nodes.Class
