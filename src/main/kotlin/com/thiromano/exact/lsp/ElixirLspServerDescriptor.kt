@@ -1,12 +1,21 @@
 package com.thiromano.exact.lsp
 
+import com.thiromano.exact.settings.ExpertConfigurable
 import com.thiromano.exact.settings.ExpertSettings
 import com.google.gson.JsonObject
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.process.OSProcessHandler
 import com.intellij.icons.AllIcons
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerListener
@@ -43,6 +52,34 @@ class ElixirLspServerDescriptor(project: Project) :
                 add(JsonPrimitive(".heex"))
                 add(JsonPrimitive(".eex"))
             })
+        }
+    }
+
+    override fun startServerProcess(): OSProcessHandler {
+        try {
+            return super.startServerProcess()
+        } catch (e: ExecutionException) {
+            val expertPath = ExpertSettings.getInstance().expertPath
+                .takeUnless { it.isNullOrBlank() }
+                ?: "expert"
+
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Elixir")
+                .createNotification(
+                    "Expert Language Server not found",
+                    "Could not start \"$expertPath\". Install Expert and ensure it is on your PATH, " +
+                        "or configure the binary path in Settings.",
+                    NotificationType.WARNING
+                )
+                .addAction(object : NotificationAction("Configure Expert Path") {
+                    override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+                        ShowSettingsUtil.getInstance().showSettingsDialog(project, ExpertConfigurable::class.java)
+                        notification.expire()
+                    }
+                })
+                .notify(project)
+
+            throw e
         }
     }
 
