@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.thiromano.exact"
-version = "0.2.0"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
@@ -24,8 +24,8 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         id = "com.thiromano.exact"
-        name = "Exact: Elixir Support"
-        version = "0.2.0"
+        name = "Explore: Elixir Support"
+        version = "0.3.0"
         ideaVersion {
             sinceBuild = "253"
         }

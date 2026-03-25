@@ -1,6 +1,6 @@
 <idea-plugin require-restart="true">
     <id>com.thiromano.exact</id>
-    <name>Exact: Elixir Support</name>
+    <name>Explore: Elixir Support</name>
     <version>0.1.0</version>
     <vendor url="https://thiromano.com">thiromano</vendor>
 
@@ -19,6 +19,24 @@
     </ul>
     ]]></description>
 
+    <change-notes><![CDATA[
+    <h3>0.3.0</h3>
+    <ul>
+        <li>Renamed plugin from "Exact" to "Explore"</li>
+        <li>Elixir modules now appear in the "Classes" tab in Search Everywhere with the class icon</li>
+        <li>Elixir structs now display with the record icon in Search Everywhere</li>
+        <li>Added LSP customization: disabled unsupported LSP features (semantic tokens, type definition, folding, inlay hints, signature help, document highlights, selection range) to avoid unnecessary requests</li>
+        <li>Added initialization options: sends <code>workspaceSymbols.minQueryLength</code> and <code>additionalWatchedExtensions</code> (.heex, .eex) to Expert on startup</li>
+        <li>Added configurable "Min symbol query length" setting on the settings page</li>
+        <li>Added status bar widget showing Expert LSP server status with the Elixir icon, linking to settings</li>
+        <li>Added "Download Expert" button on the settings page to download the correct Expert binary for the current platform</li>
+        <li>Added friendly notification when Expert is not found, with "Download Expert" and "Configure Expert Path" actions</li>
+        <li>Changing the Expert binary path in settings now automatically restarts the LSP server</li>
+        <li>Added link from settings page to Elixir Color Scheme settings</li>
+        <li>Umbrella project directory mappings</li>
+    </ul>
+    ]]></change-notes>
+
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lsp</depends>
     <depends>org.jetbrains.plugins.textmate</depends>
@@ -28,7 +46,7 @@
                 parentId="language"
                 instance="com.thiromano.exact.settings.ExpertConfigurable"
                 id="com.thiromano.exact.settings.ExpertConfigurable"
-                displayName="Exact: Elixir Support"/>
+                displayName="Explore: Elixir Support"/>
 
         <applicationService
                 serviceImplementation="com.thiromano.exact.settings.ExpertSettings"/>

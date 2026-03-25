@@ -24,7 +24,7 @@ class ExpertConfigurable : Configurable {
     private var minQueryLengthSpinner: JSpinner? = null
     private var downloadButton: JButton? = null
 
-    override fun getDisplayName(): String = "Exact: Elixir Support"
+    override fun getDisplayName(): String = "Explore: Elixir Support"
 
     override fun createComponent(): JComponent {
         expertPathField = TextFieldWithBrowseButton().apply {
