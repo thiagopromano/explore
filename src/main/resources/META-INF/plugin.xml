@@ -87,6 +87,10 @@
                 language="Elixir"
                 implementationClass="com.thiromano.exact.ElixirParserDefinition"/>
 
+        <lang.commenter
+                language="Elixir"
+                implementationClass="com.thiromano.exact.ElixirCommenter"/>
+
         <fileType
                 name="Elixir"
                 language="Elixir"
